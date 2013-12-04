@@ -1,6 +1,7 @@
 @import 'bootstrap';
 
 /* mixins, variables, etc. */
+
 $grayMediumLight: #eaeaea;
 
 @mixin box_sizing {
@@ -109,6 +110,7 @@ footer {
 }
 
 /* miscellaneous */
+
 .debug_dump {
   clear: both;
   float: left;
@@ -144,4 +146,17 @@ aside {
 .gravatar {
   float: left;
   margin-right: 10px;
+}
+
+/* forms */
+
+input, textarea, select, .uneditable-input {
+  border: 1px solid #bbb;
+  width: 100%;
+  margin-bottom: 15px;
+  @include box_sizing;
+}
+
+input {
+  height: auto !important;
 }
