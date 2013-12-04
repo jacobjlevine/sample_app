@@ -104,4 +104,29 @@ describe User do
       specify { expect(user_with_invalid_password).to be_false }
     end
   end
+
+  describe "validates password length" do
+
+    describe "by rejecting short passwords" do
+      let(:too_short_password) { 'a' * 5 }
+
+      it do
+        @user.password = too_short_password
+        @user.password_confirmation = too_short_password
+
+        should_not be_valid
+      end
+    end
+
+    describe "by accepting appropriately lengthed passwords" do
+      let(:ok_length_password) { 'a' * 6 }
+
+      it do
+        @user.password = ok_length_password
+        @user.password_confirmation = ok_length_password
+
+        should be_valid
+      end
+    end
+  end
 end
