@@ -58,7 +58,7 @@ describe User do
 
   describe "when email format is invalid" do
     it "should be invalid" do
-      addresses = %w[user@foo,com user_at_foo.org example.user@foo. foo@bar_baz.com foo@bar+baz.com]
+      addresses = %w[user@foo,com user_at_foo.org example.user@foo. foo@bar_baz.com foo@bar+baz.com foo@bar..com]
       addresses.each do | invalid_address |
         @user.email = invalid_address
         expect(@user).not_to be_valid
@@ -76,15 +76,21 @@ describe User do
     end
   end
 
-  describe "when email address is already in database" do
+  describe "email address" do
     #create copy of @user and put it in database. @user should now be invalid.
+    #also verify email is downcased when saved
     before do
       @new_user = @user.dup
       @new_user.email.upcase!
       @new_user.save
     end
 
-    it { should_not be_valid }
+    it "is already in database" do
+      should_not be_valid
+    end
+    it "should be downcased" do
+      expect(@new_user.email).to eq @user.email.downcase
+    end
   end
 
   describe "return value of authenticate method" do
