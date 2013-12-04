@@ -2,17 +2,22 @@ require 'spec_helper'
 
 describe User do
 
-  before { @user = User.new(name: 'Example User', email: 'UseR@Example.com')}
+  before { @user = User.new(name: 'Example User', email: 'UseR@Example.com',
+                        password: 'foobar', password_confirmation: 'foobar') }
 
   subject { @user }
 
   it { should respond_to(:name) }
   it { should respond_to(:email) }
+  it { should respond_to(:password_digest)}
+  it { should respond_to(:password)}
+  it { should respond_to(:password_confirmation)}
+  it { should respond_to(:authenticate) }
   it { should be_valid }
 
   #test all mandatory attributes
   [:name, :email].each do | attribute |
-    describe "when #{attribute} is not present" do
+    describe "when #{attribute} is blank" do
       it "should be invalid" do
         #test all types of blank values
         [nil, '', ' '].each do | blank_string |
@@ -21,6 +26,24 @@ describe User do
         end
       end
     end
+  end
+
+  #when password and password_confirmation match but are blank, should be invalid
+  describe "when password is blank" do
+    it "should be invalid" do
+      #test all types of blank values
+      [nil, '', ' '].each do | blank_string |
+        @user = User.new(name: 'Example User', email: 'UseR@Example.com',
+                         password: blank_string, password_confirmation: blank_string, password_digest: 'xxx')
+        expect(@user).not_to be_valid
+      end
+    end
+  end
+
+  describe "when password and confirmation don't match" do
+    before { @user.password_confirmation = 'mismatch' }
+
+    it { should_not be_valid }
   end
 
   describe "when name is the max length" do
@@ -56,11 +79,29 @@ describe User do
   describe "when email address is already in database" do
     #create copy of @user and put it in database. @user should now be invalid.
     before do
-      new_user = @user.dup
-      new_user.email.upcase!
-      new_user.save
+      @new_user = @user.dup
+      @new_user.email.upcase!
+      @new_user.save
     end
 
     it { should_not be_valid }
+  end
+
+  describe "return value of authenticate method" do
+    #verify that authenticate returns user if password matches
+    #and returns false if not
+    before { @user.save }
+    let(:found_user) { User.find_by(email: @user.email) }
+
+    describe "with valid password" do
+      it { should eq found_user.authenticate(@user.password) }
+    end
+
+    describe "with invalid password" do
+      let(:user_with_invalid_password) { found_user.authenticate('invalid') }
+
+      it { should_not eq user_with_invalid_password }
+      specify { expect(user_with_invalid_password).to be_false }
+    end
   end
 end
