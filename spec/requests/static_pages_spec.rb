@@ -21,7 +21,7 @@ describe "Static pages" do
       links << { text: 'Home', title: ''}
       links << { text: 'Help', title: 'Help'}
       #will have to change when the sign-in page is built.
-      links << { text: 'Sign in', title: ''}
+      links << { text: 'Sign In', title: 'Sign In'}
       links << { text: 'About', title: 'About'}
       links << { text: 'Contact', title: 'Contact'}
       links << { text: 'Sign up now!', title: 'Sign Up'}

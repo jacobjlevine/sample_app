@@ -14,16 +14,39 @@ describe "User pages" do
     before { visit signup_path }
     let(:submit) { 'Create my account' }
 
-    it "with valid information" do
-      fill_in 'Name', with: 'Example User'
-      fill_in 'Email', with: 'example@railstutorial.org'
-      fill_in 'Password', with: 'testpw'
-      fill_in 'Confirmation', with: 'testpw'
-      expect { click_button(submit) }.to change(User, :count).by(1)
+    describe "with valid information" do
+      before do
+        fill_in 'Name', with: 'Example User'
+        fill_in 'Email', with: sample_email
+        fill_in 'Password', with: 'testpw'
+        fill_in 'Confirmation', with: 'testpw'
+      end
+      let(:sample_email) { 'example@railstutorial.org' }
+
+      it "should create a user" do
+        expect { click_button(submit) }.to change(User, :count).by(1)
+      end
+
+      describe "after saving the user" do
+        before { click_button(submit) }
+        let(:user) { User.find_by(email: sample_email) }
+
+        it { should have_title(user.name) }
+        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+      end
     end
 
-    it "with invalid information" do
-      expect { click_button(submit) }.not_to change(User, :count)
+    describe "with invalid information" do
+      it "should create a user" do
+        expect { click_button(submit) }.not_to change(User, :count)
+      end
+
+      describe "after submission" do
+        before { click_button(submit) }
+
+        it { should have_title('Sign Up')}
+        it { should have_content('errors') }
+      end
     end
   end
 
