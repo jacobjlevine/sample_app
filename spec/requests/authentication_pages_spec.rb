@@ -15,7 +15,7 @@ describe "AuthenticationPages" do
     before { visit signin_path }
 
     describe "with invalid information" do
-      before { click_button 'Sign In' }
+      before { invalid_sign_in }
 
       it { should have_title 'Sign In' }
       it { should have_selector 'div.alert.alert-error', text: 'Invalid' }
@@ -28,13 +28,8 @@ describe "AuthenticationPages" do
     end
 
     describe "with valid information" do
-      before do
-        # Upcase email to ensure that login is case insensitive.
-        fill_in 'Email', with: user.email.upcase
-        fill_in 'Password', with: user.password
-        click_button 'Sign In'
-      end
-      let(:user) { FactoryGirl.create(:user) }
+      before { valid_sign_in(user) }
+      let(:user) { create_user }
 
       it { should have_title user.name }
       it { should have_link('Sign Out', href: signout_path) }

@@ -24,7 +24,7 @@ describe "Static pages" do
     it { should_not have_title('| Home') }
 
     describe "should have valid links" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { create_user }
       let(:links) do
         links = []
         links << { text: 'Home', title: ''}
@@ -53,17 +53,12 @@ describe "Static pages" do
       end
 
       describe "after sign in" do
-        before do
-          click_link "Sign In"
-          fill_in "Email", with: user.email
-          fill_in "Password", with: user.password
-          click_button "Sign In"
-        end
+        before { valid_sign_in(user) }
 
         it { should_have_valid_links(signed_in_links) }
 
         describe "and sign out" do
-          before { click_link "Sign Out" }
+          before { sign_out }
 
           it { should_have_valid_links(signed_out_links) }
           it { should have_title full_title }
