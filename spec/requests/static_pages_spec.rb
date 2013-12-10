@@ -40,11 +40,9 @@ describe "Static pages" do
       end
       let(:signed_in_links) do
         signed_in_links = links
-        # will have to change when Users page created
-        signed_in_links << { text: 'Users', title: '' }
+        signed_in_links << { text: 'Users', title: 'All Users' }
         signed_in_links << { text: 'Profile', title: user.name }
-        # will have to change when Settings page created
-        signed_in_links << { text: 'Settings', title: '' }
+        signed_in_links << { text: 'Settings', title: 'Edit' }
         signed_in_links << { text: 'Sign Out', title: '' }
       end
 

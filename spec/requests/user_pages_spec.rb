@@ -59,4 +59,65 @@ describe "User pages" do
     it { should have_title(user.name) }
   end
 
+  describe "edit" do
+    let(:user) { create_user }
+    before do
+      valid_sign_in(user)
+      visit edit_user_path(user)
+    end
+
+    describe "page" do
+      it { should have_content("Update your profile") }
+      it { should have_title("Edit User") }
+      it { should have_link("Change", href: "http://gravatar.com/emails") }
+    end
+
+    describe "with invalid information" do
+      # password confirmation starts out blank so should return error
+      before { click_button "Save" }
+
+      it { should have_content("error") }
+    end
+
+    describe "with valid information" do
+      let(:new_name) { "New Name" }
+      let(:new_email) { "new_email@test.com" }
+
+      before do
+        fill_in "Name", with: new_name
+        fill_in "Email", with: new_email
+        fill_in "Password", with: user.password
+        fill_in "Confirmation", with: user.password
+        click_button "Save"
+      end
+
+      it { should have_title new_name }
+      it { should have_selector("div.alert.alert-success")}
+      specify { expect(user.reload.email).to eq new_email }
+
+    end
+
+  end
+
+  describe "user index" do
+    before do
+      create_user name: "Bob", email: "bob@example.com"
+      create_user name: "Bill", email: "bill@example.com"
+      visit users_path
+      fill_in "Email", with: user.email
+      fill_in "Password", with: user.password
+      click_button "Sign In"
+    end
+    let(:user) { create_user }
+
+    it { should have_title "All Users" }
+    it { should have_content "All Users" }
+
+    it "should list each user" do
+      User.all.each do |user|
+        expect(page).to have_selector("li", text: user.name)
+      end
+    end
+  end
+
 end
