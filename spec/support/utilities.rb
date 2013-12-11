@@ -8,11 +8,17 @@ def full_title(page_title = '')
 end
 
 def create_user(options = {})
-  #if email.blank?
-  #  FactoryGirl.create(:user)
-  #else
+  # If "times" option exists, use it and delete it from the hash
+  # so it doesn't interfere with the FactoryGirl.create method
+  # otherwise just create a single user
+  times = options.delete(:times) || 1
+  # Can't wrap create statement if times == 1 because then the
+  # user won't be returned.
+  if times == 1
     FactoryGirl.create(:user, options)
-  #end
+  else
+    times.times { FactoryGirl.create(:user, options) }
+  end
 end
 
 def valid_sign_in(user, options={} )
@@ -27,6 +33,10 @@ def valid_sign_in(user, options={} )
     fill_in "Email", with: user.email.upcase
     fill_in "Password", with: user.password
     click_button "Sign In"
+  end
+  return_to = options[:return_to]
+  if return_to
+    visit return_to
   end
 end
 
