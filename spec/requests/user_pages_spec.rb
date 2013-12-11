@@ -102,6 +102,7 @@ describe "User pages" do
   describe "user index" do
     let(:user) { create_user }
     before(:each) do
+      create_user
       valid_sign_in user
       visit users_path
     end
@@ -118,6 +119,28 @@ describe "User pages" do
       it "should list each user" do
         User.paginate(page: 1).each do |user|
           expect(page).to have_selector("li", text: user.name)
+        end
+      end
+    end
+
+    describe "delete links" do
+      describe "should not be visible for regular users" do
+        it { should_not have_link("delete") }
+      end
+
+      describe "admins" do
+        let(:admin) { create_user({}, :admin) }
+        before { valid_sign_in admin, return_to: users_path }
+
+        it { should have_link("delete", href: user_path(User.first)) }
+        it "should be able to delete user" do
+          expect do
+            click_link("delete", match: :first)
+          end.to change(User, :count).by(-1)
+        end
+
+        it "should not be able to delete themselves" do
+          should_not have_link("delete", href: user_path(admin))
         end
       end
     end

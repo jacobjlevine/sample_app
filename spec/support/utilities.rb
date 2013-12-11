@@ -7,7 +7,7 @@ def full_title(page_title = '')
   end
 end
 
-def create_user(options = {})
+def create_user(options = {}, user_type = :user)
   # If "times" option exists, use it and delete it from the hash
   # so it doesn't interfere with the FactoryGirl.create method
   # otherwise just create a single user
@@ -15,9 +15,9 @@ def create_user(options = {})
   # Can't wrap create statement if times == 1 because then the
   # user won't be returned.
   if times == 1
-    FactoryGirl.create(:user, options)
+    FactoryGirl.create(user_type, options)
   else
-    times.times { FactoryGirl.create(:user, options) }
+    times.times { FactoryGirl.create(user_type, options) }
   end
 end
 

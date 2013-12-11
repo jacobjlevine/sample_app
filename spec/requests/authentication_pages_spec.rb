@@ -45,6 +45,7 @@ describe "Authentication" do
       let(:user) { create_user }
 
       describe "in the Users Controller" do
+
         describe "visiting the edit page" do
           before { visit edit_user_path(user) }
 
@@ -62,6 +63,32 @@ describe "Authentication" do
           before { visit users_path }
 
           it { should have_title "Sign In" }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete user_path(user) }
+
+          specify { expect(response).to redirect_to(signin_path) }
+
+          describe "regular users should not have access" do
+            before do
+              reg_user = create_user
+              valid_sign_in reg_user, no_capybara: true
+              delete user_path(user)
+            end
+
+            specify { expect(response).to redirect_to(root_url) }
+          end
+
+          describe "admins should have access" do
+            before do
+              admin = create_user({}, :admin)
+              valid_sign_in admin, no_capybara: true
+              delete user_path(user)
+            end
+
+            specify { expect(response).to redirect_to(users_url) }
+          end
         end
       end
 
