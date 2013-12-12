@@ -20,6 +20,13 @@ describe "Static pages" do
       end
     end
 
+    def should_not_have_links(links)
+      links.each do | link |
+        visit root_path
+        expect(page).not_to have_link(link[:text])
+      end
+    end
+
     it_should_behave_like "all static pages"
     it { should_not have_title('| Home') }
 
@@ -31,15 +38,14 @@ describe "Static pages" do
         links << { text: 'Help', title: 'Help'}
         links << { text: 'About', title: 'About'}
         links << { text: 'Contact', title: 'Contact'}
-        links << { text: 'Sign up now!', title: 'Sign Up'}
         links << { text: 'sample app', title: ''}
       end
       let(:signed_out_links) do
-        signed_out_links = links
+        signed_out_links = []
         signed_out_links << { text: 'Sign In', title: 'Sign In'}
       end
       let(:signed_in_links) do
-        signed_in_links = links
+        signed_in_links = []
         signed_in_links << { text: 'Users', title: 'All Users' }
         signed_in_links << { text: 'Profile', title: user.name }
         signed_in_links << { text: 'Settings', title: 'Edit' }
@@ -47,13 +53,17 @@ describe "Static pages" do
       end
 
       describe "before sign in" do
+        it { should_have_valid_links(links) }
         it { should_have_valid_links(signed_out_links) }
+        it { should_not_have_links(signed_in_links) }
       end
 
       describe "after sign in" do
         before { valid_sign_in(user) }
 
+        it { should_have_valid_links(links) }
         it { should_have_valid_links(signed_in_links) }
+        it { should_not_have_links(signed_out_links) }
 
         describe "and sign out" do
           before { sign_out }

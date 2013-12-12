@@ -89,10 +89,22 @@ describe "Authentication" do
 
             specify { expect(response).to redirect_to(users_url) }
           end
+
+          describe "admins shouldn't be able to delete themselves" do
+            let(:admin) { create_user({}, :admin) }
+            let(:delete_self) { delete user_path(admin) }
+            before do
+              valid_sign_in admin, no_capybara: true
+            end
+
+            specify { expect{ delete_self }.not_to change(User, :count) }
+            specify { expect( delete_self ).to redirect_to(users_url) }
+          end
         end
       end
 
       describe "when attempting to visit a protected site" do
+        let(:page_title) { "Edit User" }
         before do
           visit edit_user_path(user)
           fill_in "Email", with: user.email
@@ -101,7 +113,17 @@ describe "Authentication" do
         end
 
         it "after signing in, should render the desired protected page" do
-          expect(page).to have_title("Edit User")
+          expect(page).to have_title(page_title)
+        end
+
+        describe "subsequent sign-ins should not return to the original desired page" do
+          before do
+            sign_out
+            valid_sign_in user
+          end
+
+          it { should_not have_title page_title }
+          it { should have_title user.name }
         end
       end
     end

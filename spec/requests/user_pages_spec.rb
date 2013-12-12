@@ -145,4 +145,49 @@ describe "User pages" do
       end
     end
   end
+
+  describe "admin attribute should not be available in params" do
+    let(:user) { create_user }
+    before do
+      valid_sign_in user, no_capybara: true
+      patch user_path(user), user: { name: user.name,
+                                    email: user.email,
+                                    password: user.password,
+                                    password_confirmation: user.password,
+                                    admin: true }
+    end
+
+    specify { expect(user.reload.admin).to be_false }
+  end
+
+  describe "logged-in users shouldn't be able to access" do
+    let(:user) { create_user }
+
+    describe "the signup page" do
+      before do
+        valid_sign_in user
+        visit signup_path
+      end
+
+      it { should have_title full_title(user.name) }
+    end
+
+    describe "Users#new" do
+      before do
+        valid_sign_in user, no_capybara: true
+        get signup_path
+      end
+
+      specify { expect(response).to redirect_to user_path(user) }
+    end
+
+    describe "Users#create" do
+      before do
+        valid_sign_in user, no_capybara: true
+        post users_path
+      end
+
+      specify { expect(response).to redirect_to user_path(user) }
+    end
+  end
 end
