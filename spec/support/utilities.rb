@@ -47,3 +47,7 @@ end
 def sign_out
   click_link "Sign Out"
 end
+
+def create_micropost(options = {})
+  FactoryGirl.create(:micropost, options)
+end

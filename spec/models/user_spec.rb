@@ -15,6 +15,7 @@ describe User do
   it { should respond_to(:authenticate) }
   it { should respond_to(:remember_token) }
   it { should respond_to(:admin) }
+  it { should respond_to(:microposts) }
 
   it { should be_valid }
   it { should_not be_admin }
@@ -149,6 +150,28 @@ describe User do
     before do
       @user.save!
       @user.toggle!(:admin)
+    end
+  end
+
+  describe "micropost associations" do
+    before { @user.save }
+    let!(:older_micropost) { create_micropost(user: @user, created_at: 1.day.ago)}
+    let!(:newer_micropost) { create_micropost(user: @user, created_at: 1.hour.ago)}
+
+    it "should have the microposts in order from newest to oldest" do
+      expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+    end
+
+    describe "when user is deleted" do
+      let!(:microposts) { @user.microposts.to_a }
+      before do
+        @user.destroy
+      end
+
+      specify "microposts should be deleted" do
+        expect(microposts).not_to be_empty
+        expect(Micropost.where(user_id: @user.id)).to be_empty
+      end
     end
   end
 end
