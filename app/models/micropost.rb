@@ -1,6 +1,7 @@
 class Micropost < ActiveRecord::Base
   # get access to time_ago_in_words
   include ActionView::Helpers::DateHelper
+  include MicropostsHelper
 
   belongs_to :user
   default_scope -> { order("created_at DESC") }

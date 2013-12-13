@@ -1,5 +1,5 @@
 <li class="post">
-  <span class="content"><%= micropost.content %></span>
+  <span class="content"><%= wrap(micropost.content) %></span>
   <span class="timestamp"><%= micropost.posted_time_in_words %></span>
-  <span><%= link_to "delete", micropost, method: :delete, data: { confirm: "Are you sure?" } %></span>
+  <span><%= render "shared/micropost_delete_link", post: micropost %></span>
 </li>

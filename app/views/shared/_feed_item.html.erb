@@ -4,12 +4,12 @@
     <%= link_to feed_item.user.name, feed_item.user %>
   </span>
   <span class = "content">
-    <%= feed_item.content %>
+    <%= wrap(feed_item.content) %>
   </span>
   <span class = "timestamp">
     <%= feed_item.posted_time_in_words %>
   </span>
   <% if feed_item.user == current_user %>
-      <span><%= link_to "delete", feed_item, method: :delete, data: { confirm: "Are you sure?" } %></span>
+      <span><%= render "shared/micropost_delete_link", post: feed_item %></span>
   <% end %>
 </li>
