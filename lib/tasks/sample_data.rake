@@ -21,7 +21,7 @@ namespace :db do
       50.times do |n|
         content = Faker::Lorem.sentence(5)
         created_at = rand(1000).hours.ago
-        user.micropost.create!(content: content,
+        user.microposts.create!(content: content,
                               created_at: created_at)
       end
     end
