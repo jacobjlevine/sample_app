@@ -88,6 +88,19 @@ describe "Static pages" do
           expect(page).to have_selector("li##{post.id}", text: post.content)
         end
       end
+
+      describe "delete links" do
+        describe "should exist only for own posts" do
+          #change this after feed updated to reflect not just own posts
+          specify { expect(1).to eq 2 }
+        end
+
+        describe "should work" do
+          specify { expect do
+            click_link "delete", match: :first
+          end.to change(Micropost, :count).by(-1) }
+        end
+      end
     end
   end
 

@@ -1,4 +1,5 @@
 <li class="post">
   <span class="content"><%= micropost.content %></span>
   <span class="timestamp"><%= micropost.posted_time_in_words %></span>
+  <span><%= link_to "delete", micropost, method: :delete, data: { confirm: "Are you sure?" } %></span>
 </li>
