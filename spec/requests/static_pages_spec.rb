@@ -73,6 +73,22 @@ describe "Static pages" do
         end
       end
     end
+
+    describe "for signed in users" do
+      let(:user) { create_user }
+      let!(:m1) { create_micropost(user: user) }
+      let!(:m2) { create_micropost(user: user) }
+      before do
+        valid_sign_in user
+        visit root_path
+      end
+
+      it "should render the user feed" do
+        user.feed.each do |post|
+          expect(page).to have_selector("li##{post.id}", text: post.content)
+        end
+      end
+    end
   end
 
   describe "Help page" do

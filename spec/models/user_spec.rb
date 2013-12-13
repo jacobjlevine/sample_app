@@ -155,11 +155,11 @@ describe User do
 
   describe "micropost associations" do
     before { @user.save }
-    let!(:older_micropost) { create_micropost(user: @user, created_at: 1.day.ago)}
-    let!(:newer_micropost) { create_micropost(user: @user, created_at: 1.hour.ago)}
+    let!(:older_post) { create_micropost(user: @user, created_at: 1.day.ago)}
+    let!(:newer_post) { create_micropost(user: @user, created_at: 1.hour.ago)}
 
     it "should have the microposts in order from newest to oldest" do
-      expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+      expect(@user.microposts.to_a).to eq [newer_post, older_post]
     end
 
     describe "when user is deleted" do
@@ -172,6 +172,15 @@ describe User do
         expect(microposts).not_to be_empty
         expect(Micropost.where(user_id: @user.id)).to be_empty
       end
+    end
+
+    describe "status feed" do
+      let(:other_user) { create_user }
+      let(:unfollowed_post) { create_micropost user: other_user }
+
+      its(:feed) { should include(newer_post) }
+      its(:feed) { should include(older_post) }
+      its(:feed) { should_not include(unfollowed_post) }
     end
   end
 end

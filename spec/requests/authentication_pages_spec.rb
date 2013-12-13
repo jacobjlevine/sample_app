@@ -101,6 +101,47 @@ describe "Authentication" do
             specify { expect( delete_self ).to redirect_to(users_url) }
           end
         end
+
+        describe "as wrong user" do
+          let(:user) { create_user }
+          let(:wrong_user) { create_user(email: "wrong@example.com") }
+
+          before { valid_sign_in user, no_capybara: true }
+
+          describe "submitting GET request to Users#edit" do
+            before { get edit_user_path(wrong_user) }
+
+            specify { expect(response.body).not_to match(full_title "Edit User") }
+            specify { expect(response).to redirect_to(root_url) }
+          end
+
+          describe "submitting PATCH request to Users#update" do
+            before { patch user_path(wrong_user) }
+
+            specify { expect(response).to redirect_to(root_url) }
+          end
+        end
+      end
+
+      describe "in the Microposts controller" do
+        let(:user) { create_user }
+        let(:micropost) { create_micropost user: user }
+
+        describe "submitting to the create action" do
+          before { post microposts_path }
+
+          it "should require the user be signed in" do
+            expect(response).to redirect_to signin_path
+          end
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete micropost_path(micropost) }
+
+          it "should require the user be signed in" do
+            expect(response).to redirect_to signin_path
+          end
+        end
       end
 
       describe "when attempting to visit a protected site" do
@@ -125,26 +166,6 @@ describe "Authentication" do
           it { should_not have_title page_title }
           it { should have_title user.name }
         end
-      end
-    end
-
-    describe "as wrong user" do
-      let(:user) { create_user }
-      let(:wrong_user) { create_user(email: "wrong@example.com") }
-
-      before { valid_sign_in user, no_capybara: true }
-
-      describe "submitting GET request to Users#edit" do
-        before { get edit_user_path(wrong_user) }
-
-        specify { expect(response.body).not_to match(full_title "Edit User") }
-        specify { expect(response).to redirect_to(root_url) }
-      end
-
-      describe "submitting PATCH request to Users#update" do
-        before { patch user_path(wrong_user) }
-
-        specify { expect(response).to redirect_to(root_url) }
       end
     end
   end

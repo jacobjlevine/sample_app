@@ -53,10 +53,20 @@ describe "User pages" do
 
   describe "profile page" do
     let(:user) { create_user }
+    let!(:m1) { create_micropost user: user, content: "foo", created_at: 1.days.ago }
+    let!(:m2) { create_micropost user: user, content: "bar", created_at: 2.days.ago }
     before { visit user_path(user) }
 
     it { should have_content(user.name) }
     it { should have_title(user.name) }
+
+    describe "microposts" do
+      it { should have_content m1.content }
+      it { should have_content m2.content }
+      it { should have_content "Microposts (2)" }
+      it { should have_content "Posted 1 day ago." }
+      it { should have_content "Posted 2 days ago." }
+    end
   end
 
   describe "edit" do

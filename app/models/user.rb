@@ -19,6 +19,10 @@ class User < ActiveRecord::Base
     SecureRandom.urlsafe_base64
   end
 
+  def feed
+    self.microposts
+  end
+
   private
 
     def create_remember_token
