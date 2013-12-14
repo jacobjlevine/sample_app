@@ -1,5 +1,10 @@
 class User < ActiveRecord::Base
   has_many :microposts, dependent: :destroy
+  has_many :relationships, foreign_key: "follower_id", dependent: :destroy
+  has_many :followed_users, through: :relationships, source: :followed
+  has_many :reverse_relationships, class_name: "Relationship",
+           foreign_key: "followed_id", dependent: :destroy
+  has_many :followers, through: :reverse_relationships
 
   before_save { email.downcase! }
   before_create :create_remember_token
@@ -21,6 +26,24 @@ class User < ActiveRecord::Base
 
   def feed
     self.microposts
+  end
+
+  # used mostly for testing; generally would use the
+  # follow! method to create a new relationship
+  def build_relationship(followed)
+    self.relationships.build(followed: followed)
+  end
+
+  def follow!(followed)
+    self.relationships.create!(followed: followed)
+    end
+
+  def unfollow!(followed)
+    self.relationships.find_by(followed: followed).destroy!
+  end
+
+  def following?(user)
+    user.in? followed_users
   end
 
   private

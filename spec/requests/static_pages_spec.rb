@@ -92,7 +92,7 @@ describe "Static pages" do
       describe "delete links" do
         describe "should exist only for own posts" do
           #change this after feed updated to reflect not just own posts
-          specify { expect(1).to eq 2 }
+          pending { }
         end
 
         describe "should work" do
