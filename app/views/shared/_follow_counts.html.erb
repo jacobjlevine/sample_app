@@ -1,0 +1,5 @@
+<% @user ||= current_user %>
+<div class = "follow-counts">
+  <%= link_to "#{@user.followed_users.count} following", following_user_path(@user) %>
+  <%= link_to pluralize(@user.followers.count, "follower"), followers_user_path(@user) %>
+</div>

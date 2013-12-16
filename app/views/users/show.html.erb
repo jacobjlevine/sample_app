@@ -7,8 +7,12 @@
         <%= @user.name %>
       </h1>
     </section>
+    <section>
+      <%= render "shared/follow_counts" %>
+    </section>
   </aside>
   <div class="span8">
+    <%= render "follow_form" %>
     <% if @user.microposts.any? %>
       <h3>Microposts (<%= @user.microposts.count %>)</h3>
       <ol class="microposts">

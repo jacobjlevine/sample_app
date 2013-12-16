@@ -101,6 +101,28 @@ describe "Static pages" do
           end.to change(Micropost, :count).by(-1) }
         end
       end
+
+      describe "following counts" do
+        let(:followed) { create_user }
+        before do
+          user.follow!(followed)
+          visit root_path
+        end
+
+        it { should have_link "1 following", href: following_user_path(user) }
+        it { should have_link "0 followers", href: followers_user_path(user) }
+      end
+
+      describe "follower counts" do
+        let(:follower) { create_user }
+        before do
+          follower.follow!(user)
+          visit root_path
+        end
+
+        it { should have_link "0 following", href: following_user_path(user) }
+        it { should have_link "1 follower", href: followers_user_path(user) }
+      end
     end
   end
 

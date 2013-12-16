@@ -1,0 +1,7 @@
+<% if signed_in? && current_user != @user %>
+    <% if current_user.in?(@user.followers)%>
+        <%= render "unfollow_button" %>
+    <% else %>
+        <%= render "follow_button" %>
+    <% end %>
+<% end %>

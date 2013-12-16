@@ -59,6 +59,8 @@ describe "User pages" do
 
     it { should have_content(user.name) }
     it { should have_title(user.name) }
+    # note: full test for follow count section appears in static_pages_spec
+    it { should have_selector("div.follow-counts") }
 
     describe "microposts" do
       it { should have_content m1.content }
@@ -66,6 +68,59 @@ describe "User pages" do
       it { should have_content "Microposts (2)" }
       it { should have_content "Posted 1 day ago." }
       it { should have_content "Posted 2 days ago." }
+    end
+
+    describe "follow/unfollow button" do
+      let(:follow_text) { "Follow" }
+      let(:unfollow_text) { "Unfollow" }
+      let(:followed_user) { create_user }
+      let(:unfollowed_user) { create_user }
+      before do
+        user.follow!(followed_user)
+      end
+
+      describe "shouldn't appear when user logged out" do
+        it { should_not have_button follow_text }
+        it { should_not have_button unfollow_text }
+      end
+
+      describe "shouldn't appear when viewing own profile" do
+        before do
+          valid_sign_in user
+          visit user_path(user)
+        end
+
+        it { should_not have_button follow_text }
+        it { should_not have_button unfollow_text }
+      end
+
+      describe "follow button" do
+        before do
+          valid_sign_in user
+          visit user_path(unfollowed_user)
+        end
+
+        describe "should appear on profiles of unfollowed users" do
+          it { should have_button follow_text }
+          it { should_not have_button unfollow_text }
+        end
+
+        specify { expect { click_button follow_text }.to change(Relationship, :count).by(1) }
+      end
+
+      describe "unfollow button" do
+        before do
+          valid_sign_in user
+          visit user_path(followed_user)
+        end
+
+        describe "should appear on profiles of followed users" do
+          it { should_not have_button follow_text }
+          it { should have_button unfollow_text }
+        end
+
+        specify { expect { click_button unfollow_text }.to change(Relationship, :count).by(-1) }
+      end
     end
   end
 
