@@ -211,6 +211,36 @@ describe "User pages" do
     end
   end
 
+  describe "following/followers pages" do
+    let(:follower) { create_user }
+    let(:followed_user) { create_user }
+    before do
+      follower.follow! followed_user
+      # doesn't matter which user is signed in as long as one of them is
+      valid_sign_in follower
+    end
+
+    describe "following page" do
+      before do
+        visit following_user_path follower
+      end
+
+      it { should have_title full_title "Following" }
+      it { should have_selector "h3", "Following" }
+      it { should have_link followed_user.name, user_path(followed_user) }
+    end
+
+    describe "followers page" do
+      before do
+        visit followers_user_path followed_user
+      end
+
+      it { should have_title full_title "Followers" }
+      it { should have_selector "h3", "Followers" }
+      it { should have_link follower.name, user_path(follower) }
+    end
+  end
+
   describe "admin attribute should not be available in params" do
     let(:user) { create_user }
     before do
