@@ -19,15 +19,32 @@ describe "Relationship pages" do
 
       specify { expect(response).to redirect_to root_path }
     end
+
+    describe "successfully" do
+      before { valid_sign_in follower, no_capybara: true }
+
+      specify { expect do
+        post relationships_path(relationship: { followed_id: followed.id })
+      end.to change(Relationship, :count).by(1) }
+    end
   end
 
   describe "destroy relationship" do
+    let(:relationship) { follower.relationships.find_by(followed_id: followed.id) }
     before { follower.follow! followed }
 
     describe "must be logged in" do
-      before { delete relationship_path(follower.relationships.find_by(followed_id: followed.id)) }
+      before { delete relationship_path(relationship) }
 
       specify { expect(response).to redirect_to signin_path }
+    end
+
+    describe "successfully" do
+      before { valid_sign_in follower, no_capybara: true }
+
+      specify { expect do
+        delete relationship_path(relationship)
+      end.to change(Relationship, :count).by(-1) }
     end
   end
 end

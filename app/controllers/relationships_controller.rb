@@ -3,16 +3,22 @@ class RelationshipsController < ApplicationController
   before_action :not_self, only: :create
 
   def create
-    user = User.find(params[:relationship][:followed_id])
-    current_user.follow! user
-    redirect_to user_path(user)
+    @user = User.find(params[:relationship][:followed_id])
+    current_user.follow! @user
+    respond_to do |format|
+      format.html { redirect_to user_path(@user) }
+      format.js { render "update_follow_elements" }
+    end
   end
 
   def destroy
     relationship = Relationship.find(params[:id])
-    followed = User.find(relationship[:followed_id])
-    current_user.unfollow! followed
-    redirect_to user_path(followed)
+    @user = User.find(relationship[:followed_id])
+    current_user.unfollow! @user
+    respond_to do |format|
+      format.html { redirect_to user_path(@user) }
+      format.js { render "update_follow_elements" }
+    end
   end
 
   private

@@ -68,6 +68,30 @@ describe "User pages" do
       it { should have_content "Microposts (2)" }
       it { should have_content "Posted 1 day ago." }
       it { should have_content "Posted 2 days ago." }
+
+      describe "delete link" do
+
+        describe "should not exist when logged out" do
+          it { should_not have_link "delete", micropost_path(m1) }
+        end
+
+        describe "should exist for own posts" do
+          before do
+            valid_sign_in user
+            visit user_path(user)
+          end
+
+          it { should have_link "delete", micropost_path(m1) }
+        end
+
+        describe "should not exist for others' posts" do
+          let(:other_user) { create_user }
+          let!(:m3) { create_micropost user: other_user, content: "foo", created_at: 1.days.ago }
+          before { visit user_path(other_user) }
+
+          it { should_not have_link "delete", micropost_path(m3) }
+        end
+      end
     end
 
     describe "follow/unfollow button" do
@@ -105,6 +129,12 @@ describe "User pages" do
           it { should_not have_button unfollow_text }
         end
 
+        describe "toggle button" do
+          before { click_button follow_text }
+
+          it { should have_button unfollow_text }
+        end
+
         specify { expect { click_button follow_text }.to change(Relationship, :count).by(1) }
       end
 
@@ -117,6 +147,12 @@ describe "User pages" do
         describe "should appear on profiles of followed users" do
           it { should_not have_button follow_text }
           it { should have_button unfollow_text }
+        end
+
+        describe "toggle button" do
+          before { click_button unfollow_text }
+
+          it { should have_button follow_text }
         end
 
         specify { expect { click_button unfollow_text }.to change(Relationship, :count).by(-1) }
