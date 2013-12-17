@@ -76,52 +76,61 @@ describe "Static pages" do
 
     describe "for signed in users" do
       let(:user) { create_user }
+      let(:followed_user) { create_user }
+      let(:unfollowed_user) { create_user }
       let!(:m1) { create_micropost(user: user) }
       let!(:m2) { create_micropost(user: user) }
+      let!(:followed_post) { create_micropost(user: followed_user) }
+      let!(:unfollowed_post) { create_micropost(user: unfollowed_user) }
       before do
+        user.follow!(followed_user)
         valid_sign_in user
         visit root_path
       end
 
-      it "should render the user feed" do
-        user.feed.each do |post|
-          expect(page).to have_selector("li##{post.id}", text: post.content)
+      describe "should render the user feed" do
+        specify do
+          user.feed.each do |post|
+            expect(page).to have_selector("li##{post.id}", text: post.content)
+          end
+        end
+
+        it "should include posts by followed users" do
+          expect(page).to have_selector("li##{followed_post.id}", text: followed_post.content)
+        end
+
+        it "should not include posts by unfollowed users" do
+          expect(page).not_to have_selector("li##{unfollowed_post.id}", text: unfollowed_post.content)
         end
       end
 
       describe "delete links" do
-        describe "should exist only for own posts" do
-          #change this after feed updated to reflect not just own posts
-          pending { }
-        end
 
         describe "should work" do
           specify { expect do
             click_link "delete", match: :first
           end.to change(Micropost, :count).by(-1) }
         end
+
+        describe "should exist only for own posts" do
+          specify { expect(page).not_to have_link "delete", href: micropost_path(followed_post) }
+        end
       end
 
       describe "following counts" do
-        let(:followed) { create_user }
-        before do
-          user.follow!(followed)
-          visit root_path
-        end
 
         it { should have_link "1 following", href: following_user_path(user) }
         it { should have_link "0 followers", href: followers_user_path(user) }
       end
 
       describe "follower counts" do
-        let(:follower) { create_user }
         before do
-          follower.follow!(user)
+          valid_sign_in followed_user
           visit root_path
         end
 
-        it { should have_link "0 following", href: following_user_path(user) }
-        it { should have_link "1 follower", href: followers_user_path(user) }
+        it { should have_link "0 following", href: following_user_path(followed_user) }
+        it { should have_link "1 follower", href: followers_user_path(followed_user) }
       end
     end
   end

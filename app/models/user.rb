@@ -25,7 +25,12 @@ class User < ActiveRecord::Base
   end
 
   def feed
-    self.microposts
+    user_ids_for_feed = "SELECT id FROM relationships
+                        WHERE follower_id = :user_id
+                        UNION ALL
+                        SELECT :user_id"
+    Micropost.where("user_id IN (#{user_ids_for_feed})", user_id: id)
+
   end
 
   # used mostly for testing; generally would use the

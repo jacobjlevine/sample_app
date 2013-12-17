@@ -39,6 +39,18 @@ describe "Relationship pages" do
       specify { expect(response).to redirect_to signin_path }
     end
 
+    describe "can only destroy if user is the follower" do
+      before do
+        valid_sign_in followed, no_capybara: true
+      end
+
+      specify do
+        delete relationship_path(relationship)
+        expect(response).to redirect_to root_path
+      end
+      specify { expect { delete relationship_path(relationship) }.not_to change(Relationship, :count) }
+    end
+
     describe "successfully" do
       before { valid_sign_in follower, no_capybara: true }
 
